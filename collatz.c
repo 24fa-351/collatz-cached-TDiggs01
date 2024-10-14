@@ -1,37 +1,43 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
-unsigned long long int rand_Num( unsigned long long int N_, unsigned long long int MAX_, unsigned long long int MIN_) {
+unsigned long long int steps = 1;
+
+unsigned long long int collatz( FILE *fpt_, unsigned long long int RN, unsigned long long int MAX_, unsigned long long int MIN_ ) {   
+
+        fprintf( fpt_, "%llu, %llu \n", RN, steps );
+        
+        if( RN == 1) {
+            return 1;
+        }
+        else if (RN % 2 == 0) // If even
+        {
+            steps = steps + 1;
+            return collatz(fpt_, RN / 2, MAX_, MIN_ );
+        }
+        else // If odd
+        {
+            steps = steps + 1;
+            return collatz(fpt_, (3 * RN) + 1, MAX_, MIN_ );
+        }
+        
+    }
+
+unsigned long long int wrapper_collatz( unsigned long long int RN, unsigned long long int MAX_, unsigned long long int MIN_) {
     
     FILE *fpt;
 
     fpt = fopen("MyFile.csv", "w+");
 
-    unsigned long long int i = 0;
-
-    unsigned long long int count = 1;
-
-    unsigned long long int RN = rand() % (MAX_ - MIN_ + 1) + MIN_;
-    
     fprintf(fpt, "Number, Steps\n");
 
-     while( i != N_ ) {   
-        
-        fprintf(fpt, "%llu, %llu \n", RN, count);
-        
-        if( RN == 1) {
-            return count;
-        }
+    return collatz(fpt, RN, MAX_, MIN_ );
 
-        count = count + 1;
-        i = i +1;
-
-        RN = rand() % (MAX_ - MIN_ + 1) + MIN_;
-        
-    }
     fclose(fpt);
 }
+
 
 int main( int argc, char *argv[] ) {
     
@@ -42,7 +48,7 @@ int main( int argc, char *argv[] ) {
     unsigned long long int N = rand() % (MAX - MIN + 1) + MIN;
 
     printf( "Usage: %s %llu %lld %llu\n", argv[0], N, MIN, MAX );
-    printf("%llu \n", rand_Num( N, MAX, MIN ) );
+    printf("%llu \n", wrapper_collatz( N, MAX, MIN ) );
 
    
     return 0;
